@@ -23,24 +23,24 @@
 
 ### Unity Project Setup
 
-- [ ] 🟢 Create Unity 6 (LTS) project with **HDRP** template
-- [ ] 🟢 Install packages via Package Manager:
+- [x] 🟢 Create Unity 6 (LTS) project with **HDRP** template
+- [x] 🟢 Install packages via Package Manager:
   - `com.unity.netcode.gameobjects`
   - `com.unity.services.relay`
   - `com.unity.services.lobby`
   - `com.unity.services.authentication`
   - `com.unity.sentis`
-- [ ] 🟢 Set up GitHub repository and make initial commit
-- [ ] 🟢 Configure `.gitignore` for Unity (use `github/gitignore` Unity template)
+- [x] 🟢 Set up GitHub repository and make initial commit
+- [x] 🟢 Configure `.gitignore` for Unity (use `github/gitignore` Unity template)
   - ✅ The template ignores `/Library/`, `/Temp/`, `/Logs/`, `/Build/` — correct
   - ✅ `.meta` files are **NOT ignored** — Unity auto-generates them and they must be committed; they store GUIDs that link assets to scripts and prefabs. Losing them breaks all references.
   - ❌ Never manually delete `.meta` files — always let Unity create and remove them
-- [ ] 🟡 Set up Unity Gaming Services project in the UGS dashboard and link project ID in Unity Editor
+- [x] 🟡 Set up Unity Gaming Services project in the UGS dashboard and link project ID in Unity Editor
 
 ### Grey-Box Map (Abandoned Art School)
 
-- [ ] 🟢 Create a single scene: `ArtSchool_Greybox`
-- [ ] 🟢 Block out map using Unity ProBuilder or primitive cubes:
+- [x] 🟢 Create a single scene: `ArtSchool_Greybox`
+- [x] 🟢 Block out map using Unity ProBuilder or primitive cubes:
   - Main hall (large open area)
   - 3 side rooms (corridors connecting them)
   - 2 floor levels with stairs or ramps
@@ -48,8 +48,8 @@
   - 2 Exit Gate positions (mark with placeholder quads)
   - 4 Holding Frame wall positions (mark with placeholder quads)
   - 3 Ink Station positions (mark with placeholder cubes)
-- [ ] 🟢 Add basic HDRP directional light and baked lighting (low quality — just enough to see)
-- [ ] 🟢 Add a NavMesh bake for the map (needed later for Monster AI prototyping)
+- [x] 🟢 Add basic HDRP directional light and baked lighting (low quality — just enough to see)
+- [x] 🟢 Add a NavMesh bake for the map (needed later for Monster AI prototyping)
 
 ### Networking Foundation
 

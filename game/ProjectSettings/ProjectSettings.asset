@@ -838,7 +838,8 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 1
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Standalone: SENTIS_ANALYTICS_ENABLED;APP_UI_EDITOR_ONLY
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -938,10 +939,10 @@ PlayerSettings:
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
   enableDirectStorage: 0
-  cloudProjectId: dbcd4231-4dd7-4d3e-97f7-934d7dab78cb
+  cloudProjectId: 1e06b543-1fe7-4a5c-9128-88f061dd6e73
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project
+  projectName: Dread Sketch
   organizationId: shigechumqvu1o2w
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
