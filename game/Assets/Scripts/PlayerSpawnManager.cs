@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -7,12 +8,23 @@ using UnityEngine;
 /// </summary>
 public class PlayerSpawnManager : MonoBehaviour
 {
+    public enum PlayerRole
+    {
+        Monster = 0,
+        Survivor = 1
+    }
+
     public static PlayerSpawnManager Instance { get; private set; }
 
     [SerializeField] private Transform[] spawnPoints;
 
     private readonly Dictionary<ulong, int> _clientToSpawnIndex = new Dictionary<ulong, int>();
+    private readonly Dictionary<ulong, PlayerRole> _clientToRole = new Dictionary<ulong, PlayerRole>();
     private int _nextSpawnIndex;
+
+    private bool _monsterAssigned;
+    private ulong _monsterClientId;
+    private bool _disconnectCallbackRegistered;
 
     private void Awake()
     {
@@ -24,13 +36,30 @@ public class PlayerSpawnManager : MonoBehaviour
 
         Instance = this;
         _clientToSpawnIndex.Clear();
+        _clientToRole.Clear();
         _nextSpawnIndex = 0;
+        _monsterAssigned = false;
+        _monsterClientId = 0;
+        _disconnectCallbackRegistered = false;
+    }
+
+    private void OnEnable()
+    {
+        TryRegisterDisconnectCallback();
+    }
+
+    private void OnDisable()
+    {
+        TryUnregisterDisconnectCallback();
     }
 
     public bool TryGetSpawnForClient(ulong clientId, out Vector3 position, out Quaternion rotation)
     {
         position = Vector3.zero;
         rotation = Quaternion.identity;
+
+        TryRegisterDisconnectCallback();
+        EnsureRoleAssigned(clientId);
 
         if (spawnPoints == null || spawnPoints.Length == 0)
         {
@@ -55,5 +84,81 @@ public class PlayerSpawnManager : MonoBehaviour
         position = spawn.position;
         rotation = spawn.rotation;
         return true;
+    }
+
+    public bool TryGetRole(ulong clientId, out PlayerRole role)
+    {
+        return _clientToRole.TryGetValue(clientId, out role);
+    }
+
+    public bool IsMonster(ulong clientId)
+    {
+        return _clientToRole.TryGetValue(clientId, out PlayerRole role) && role == PlayerRole.Monster;
+    }
+
+    private void EnsureRoleAssigned(ulong clientId)
+    {
+        if (_clientToRole.ContainsKey(clientId))
+        {
+            return;
+        }
+
+        if (!_monsterAssigned)
+        {
+            _clientToRole[clientId] = PlayerRole.Monster;
+            _monsterAssigned = true;
+            _monsterClientId = clientId;
+            Debug.Log($"PlayerSpawnManager: Assigned Monster role to client {clientId}.");
+            return;
+        }
+
+        _clientToRole[clientId] = PlayerRole.Survivor;
+        Debug.Log($"PlayerSpawnManager: Assigned Survivor role to client {clientId}.");
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        _clientToSpawnIndex.Remove(clientId);
+        _clientToRole.Remove(clientId);
+
+        if (_monsterAssigned && _monsterClientId == clientId)
+        {
+            _monsterAssigned = false;
+            _monsterClientId = 0;
+            Debug.LogWarning("PlayerSpawnManager: Monster disconnected. Next new connection will be assigned Monster.");
+        }
+    }
+
+    private void TryRegisterDisconnectCallback()
+    {
+        if (_disconnectCallbackRegistered)
+        {
+            return;
+        }
+
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager == null)
+        {
+            return;
+        }
+
+        networkManager.OnClientDisconnectCallback += OnClientDisconnected;
+        _disconnectCallbackRegistered = true;
+    }
+
+    private void TryUnregisterDisconnectCallback()
+    {
+        if (!_disconnectCallbackRegistered)
+        {
+            return;
+        }
+
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager != null)
+        {
+            networkManager.OnClientDisconnectCallback -= OnClientDisconnected;
+        }
+
+        _disconnectCallbackRegistered = false;
     }
 }

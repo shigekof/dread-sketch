@@ -19,10 +19,13 @@ public class NetworkPlayerController : NetworkBehaviour
     private Renderer[] _renderers;
     private Collider[] _colliders;
     private bool _isInGameplayScene;
+    private bool _loggedInitialVisibilityState;
+    private bool _loggedCameraMissing;
+    private bool _loggedCameraRecovered;
 
     private void Update()
     {
-        if (!IsOwner || !_isInGameplayScene)
+        if (!IsOwner)
         {
             return;
         }
@@ -62,14 +65,23 @@ public class NetworkPlayerController : NetworkBehaviour
             return;
         }
 
-        _mainCamera = Camera.main;
+        TryResolveMainCamera();
     }
 
     private void LateUpdate()
     {
-        if (!IsOwner || !_isInGameplayScene || _mainCamera == null)
+        if (!IsOwner || !_isInGameplayScene)
         {
             return;
+        }
+
+        if (_mainCamera == null)
+        {
+            TryResolveMainCamera();
+            if (_mainCamera == null)
+            {
+                return;
+            }
         }
 
         _mainCamera.transform.position = transform.position + cameraOffset;
@@ -100,6 +112,18 @@ public class NetworkPlayerController : NetworkBehaviour
                     _renderers[i].enabled = _isInGameplayScene;
                 }
             }
+
+            // In host-client tests, keep the local owner mesh explicitly enabled during gameplay.
+            if (_isInGameplayScene && IsOwner)
+            {
+                for (int i = 0; i < _renderers.Length; i++)
+                {
+                    if (_renderers[i] != null)
+                    {
+                        _renderers[i].enabled = true;
+                    }
+                }
+            }
         }
 
         if (_colliders != null)
@@ -111,6 +135,34 @@ public class NetworkPlayerController : NetworkBehaviour
                     _colliders[i].enabled = _isInGameplayScene;
                 }
             }
+        }
+
+        if (!_loggedInitialVisibilityState && IsOwner)
+        {
+            _loggedInitialVisibilityState = true;
+            int rendererCount = _renderers != null ? _renderers.Length : 0;
+            Debug.Log($"NetworkPlayerController: Owner {OwnerClientId}, scene={SceneManager.GetActiveScene().name}, gameplay={_isInGameplayScene}, renderers={rendererCount}, cameraMain={(_mainCamera != null)}");
+        }
+    }
+
+    private void TryResolveMainCamera()
+    {
+        _mainCamera = Camera.main;
+        if (_mainCamera == null)
+        {
+            if (!_loggedCameraMissing)
+            {
+                _loggedCameraMissing = true;
+                Debug.LogWarning($"NetworkPlayerController: Owner {OwnerClientId} could not find Camera.main in scene {SceneManager.GetActiveScene().name}. Will retry.");
+            }
+
+            return;
+        }
+
+        if (!_loggedCameraRecovered)
+        {
+            _loggedCameraRecovered = true;
+            Debug.Log($"NetworkPlayerController: Owner {OwnerClientId} attached to Camera.main '{_mainCamera.name}'.");
         }
     }
 }
