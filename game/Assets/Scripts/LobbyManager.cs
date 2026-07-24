@@ -197,6 +197,10 @@ public class LobbyManager : MonoBehaviour
                 // Join relay session
                 await _relayManager.JoinClientAsync(relayJoinCode);
                 Debug.Log("LobbyManager: Relay join completed.");
+
+                // Wait until Netcode reports this local instance is actually connected as a client.
+                await WaitForLocalClientConnectedAsync();
+                Debug.Log("LobbyManager: Netcode client connection confirmed.");
             }
             else
             {
@@ -212,6 +216,30 @@ public class LobbyManager : MonoBehaviour
             OnError?.Invoke($"Failed to join lobby: {e.Message}");
             throw;
         }
+    }
+
+    private async Task WaitForLocalClientConnectedAsync(int timeoutMs = 15000)
+    {
+        NetworkManager networkManager = NetworkManager.Singleton;
+        if (networkManager == null)
+        {
+            throw new Exception("NetworkManager.Singleton is null while waiting for client connection.");
+        }
+
+        float timeoutSeconds = timeoutMs / 1000f;
+        float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+
+        while (Time.realtimeSinceStartup < deadline)
+        {
+            if (networkManager.IsClient && networkManager.IsConnectedClient)
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException("Timed out waiting for Netcode client connection.");
     }
 
     /// <summary>
@@ -252,36 +280,60 @@ public class LobbyManager : MonoBehaviour
     /// <summary>
     /// Load the gameplay scene after session is ready.
     /// </summary>
-    public void StartGameplay()
+    public async void StartGameplay()
     {
-        if (!_isHost)
+        try
         {
-            Debug.LogWarning("LobbyManager: StartGameplay ignored - only host can start gameplay.");
-            return;
-        }
+            if (!_isHost)
+            {
+                Debug.LogWarning("LobbyManager: StartGameplay ignored - only host can start gameplay.");
+                return;
+            }
 
-        NetworkManager networkManager = NetworkManager.Singleton;
-        if (networkManager == null)
+            NetworkManager networkManager = NetworkManager.Singleton;
+            if (networkManager == null)
+            {
+                Debug.LogError("LobbyManager: Cannot start gameplay - NetworkManager.Singleton is null.");
+                return;
+            }
+
+            if (!networkManager.IsHost)
+            {
+                Debug.LogError("LobbyManager: Cannot start gameplay - this instance is not the active host.");
+                return;
+            }
+
+            if (!networkManager.NetworkConfig.EnableSceneManagement)
+            {
+                Debug.LogError("LobbyManager: Scene management is disabled in NetworkManager.");
+                return;
+            }
+
+            // Refresh lobby snapshot first, then verify Netcode-side connected clients are ready.
+            if (_currentLobby != null)
+            {
+                _currentLobby = await LobbyService.Instance.GetLobbyAsync(_currentLobby.Id);
+            }
+
+            int lobbyPlayers = _currentLobby?.Players?.Count ?? 1;
+            int connectedClients = networkManager.ConnectedClientsIds.Count;
+            if (connectedClients < lobbyPlayers)
+            {
+                string msg = $"Start blocked: Netcode connected clients ({connectedClients}) is less than lobby players ({lobbyPlayers}). Wait a moment and try again.";
+                Debug.LogWarning($"LobbyManager: {msg}");
+                OnError?.Invoke(msg);
+                return;
+            }
+
+            Debug.Log("LobbyManager: Starting synchronized gameplay scene load...");
+            SceneEventProgressStatus status = networkManager.SceneManager.LoadScene("ArtSchool_Greybox", LoadSceneMode.Single);
+            Debug.Log($"LobbyManager: Network scene load status: {status}");
+        }
+        catch (Exception e)
         {
-            Debug.LogError("LobbyManager: Cannot start gameplay - NetworkManager.Singleton is null.");
-            return;
+            Debug.LogError($"LobbyManager: Failed to start gameplay: {e.Message}");
+            OnError?.Invoke($"Failed to start gameplay: {e.Message}");
         }
-
-        if (!networkManager.IsHost)
-        {
-            Debug.LogError("LobbyManager: Cannot start gameplay - this instance is not the active host.");
-            return;
-        }
-
-        if (!networkManager.NetworkConfig.EnableSceneManagement)
-        {
-            Debug.LogError("LobbyManager: Scene management is disabled in NetworkManager.");
-            return;
-        }
-
-        Debug.Log("LobbyManager: Starting synchronized gameplay scene load...");
-        SceneEventProgressStatus status = networkManager.SceneManager.LoadScene("ArtSchool_Greybox", LoadSceneMode.Single);
-        Debug.Log($"LobbyManager: Network scene load status: {status}");
     }
 
     /// <summary>
