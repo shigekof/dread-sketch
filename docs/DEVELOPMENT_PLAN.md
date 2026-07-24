@@ -123,14 +123,23 @@ Evening  → Commit to GitHub
 **Duration:** Weeks 1–8 (2 months)
 **Goal:** A working match from start to finish. Ugly but functional. You can host a game, play Monster, and have friends join as Survivors.
 
+Status update (2026-07-24):
+- Host/client multiplayer baseline is live with Relay + Lobby + Netcode scene sync.
+- Prototype network player spawning and bidirectional movement replication are working.
+- Remaining to close the stated Week 1-2 goal: role split (Monster vs Survivors), 3-5 player scale test, and controller polish.
+
 **Scope (strict — cut anything not on this list):**
 
 **Week 1–2: Project Foundation**
-- [ ] Unity 6 project with HDRP, Netcode, Relay configured
-- [ ] Scene: one grey-box map (Abandoned Art School layout, no art)
+- [x] Unity 6 project with HDRP, Netcode, Relay configured
+- [x] Scene: one grey-box map (Abandoned Art School layout, no art)
 - [ ] Basic character controller: move, sprint, crouch (Survivors)
 - [ ] Basic Monster controller: move, lunge attack
 - [ ] Unity Relay lobby: host game, join by code, 5 players connected
+
+Week 1-2 implementation note:
+- Host and one client can currently create/join a lobby, start synchronized gameplay scene load, spawn, and move with replication.
+- The documented "5 players connected" requirement is still open until multi-client validation is completed.
 
 **Week 3–4: Drawing Systems**
 - [ ] Drawing canvas UI: open with TAB, draw with mouse, submit

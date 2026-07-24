@@ -21,6 +21,16 @@
 ## WEEK 1–2: Project Foundation
 **Goal: 5 players connected online in a grey-box map**
 
+### Status Snapshot (2026-07-24)
+
+- Multiplayer baseline is working end-to-end for host + client:
+  - Lobby create/join by code
+  - Relay transport connection
+  - Netcode scene sync from MainMenu to ArtSchool_Greybox
+  - Network player spawn, ownership, and replicated movement
+- Current player implementation is a single prototype `NetworkPlayer` prefab.
+- Remaining work to fully satisfy the week goal is scale validation (3-5 clients) and role split (Monster vs Survivors).
+
 ### Unity Project Setup
 
 - [x] 🟢 Create Unity 6 (LTS) project with **HDRP** template
@@ -53,17 +63,17 @@
 
 ### Networking Foundation
 
-- [ ] 🔴 Create `NetworkManager` GameObject with `UnityTransport` using Relay
-- [ ] 🟡 Create `LobbyManager.cs` — handles:
+- [x] 🔴 Create `NetworkManager` GameObject with `UnityTransport` using Relay
+- [x] 🟡 Create `LobbyManager.cs` — handles:
   - `CreateLobby()` — host creates session, gets join code
   - `JoinLobby(string code)` — client joins by code
   - Display join code on screen (UI Text)
-- [ ] 🟡 Create `RelayManager.cs` — handles:
+- [x] 🟡 Create `RelayManager.cs` — handles:
   - `CreateRelay(int maxPlayers)` → returns join code
   - `JoinRelay(string joinCode)` → connects client
-- [ ] 🟢 Create simple `MainMenu` scene with two buttons: **Host** and **Join**
-- [ ] 🟢 Wire Host button → `CreateLobby()` → `CreateRelay(5)` → load `ArtSchool_Greybox`
-- [ ] 🟢 Wire Join button → text input for code → `JoinLobby()` → `JoinRelay()` → load scene
+- [x] 🟢 Create simple `MainMenu` scene with two buttons: **Host** and **Join**
+- [x] 🟢 Wire Host button → `CreateLobby()` → `CreateRelay(5)` → load `ArtSchool_Greybox`
+- [x] 🟢 Wire Join button → text input for code → `JoinLobby()` → `JoinRelay()` → load scene
 
 ### Player Spawning
 
@@ -72,8 +82,12 @@
   - Players 2–5 = Survivors
 - [ ] 🟢 Create `SurvivorPrefab` — capsule mesh, `NetworkObject`, `NetworkTransform`
 - [ ] 🟢 Create `MonsterPrefab` — capsule mesh (slightly taller), `NetworkObject`, `NetworkTransform`
-- [ ] 🟢 Define 5 spawn points in the map scene (tagged `SpawnPoint`)
+- [x] 🟢 Define 5 spawn points in the map scene (tagged `SpawnPoint`)
 - [ ] 🟡 Test: host + 4 clients can all connect and see each other's capsules moving
+
+Implementation note:
+- Current prototype uses `NetworkPlayerController`, `NetworkPlayerSpawn`, and `PlayerSpawnManager` with one shared `NetworkPlayer` prefab.
+- This is acceptable for Phase 0 networking validation, but role-specific prefabs and role assignment are still pending.
 
 ---
 
