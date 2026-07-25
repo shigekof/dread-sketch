@@ -83,7 +83,7 @@
 - [x] 🟢 Create `SurvivorPrefab` — capsule mesh, `NetworkObject`, `NetworkTransform`
 - [x] 🟢 Create `MonsterPrefab` — capsule mesh (slightly taller), `NetworkObject`, `NetworkTransform`
 - [x] 🟢 Define 5 spawn points in the map scene (tagged `SpawnPoint`)
-- [ ] 🟡 Test: host + 4 clients can all connect and see each other's capsules moving
+- [x] 🟡 Test: host + 4 clients can all connect and see each other's capsules moving
 
 Implementation note:
 - Current prototype uses `NetworkPlayerController`, `NetworkPlayerSpawn`, and `PlayerSpawnManager` with one shared `NetworkPlayer` prefab.

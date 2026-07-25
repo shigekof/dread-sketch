@@ -280,6 +280,8 @@ public class RelayManager : MonoBehaviour
         {
             if (PlayerSpawnManager.Instance != null)
             {
+                PlayerSpawnManager.Instance.ResetForNewMatch();
+
                 for (int i = 0; i < _connectionOrder.Count; i++)
                 {
                     TrySpawnPlayerForClient(_connectionOrder[i]);

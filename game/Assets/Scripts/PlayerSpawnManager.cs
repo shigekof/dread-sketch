@@ -53,6 +53,19 @@ public class PlayerSpawnManager : MonoBehaviour
         TryUnregisterDisconnectCallback();
     }
 
+    /// <summary>
+    /// Call this when a new match starts to ensure clean slot assignment for all clients.
+    /// </summary>
+    public void ResetForNewMatch()
+    {
+        _clientToSpawnIndex.Clear();
+        _clientToRole.Clear();
+        _nextSpawnIndex = 0;
+        _monsterAssigned = false;
+        _monsterClientId = 0;
+        Debug.Log("PlayerSpawnManager: Reset for new match.");
+    }
+
     public bool TryGetSpawnForClient(ulong clientId, out Vector3 position, out Quaternion rotation)
     {
         position = Vector3.zero;
