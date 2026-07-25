@@ -13,7 +13,7 @@ public class NetworkPlayerController : NetworkBehaviour
     private const string GameplaySceneName = "ArtSchool_Greybox";
 
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 3f, -6f);
+    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 6f, -12f);
 
     private Camera _mainCamera;
     private Renderer[] _renderers;
@@ -102,40 +102,6 @@ public class NetworkPlayerController : NetworkBehaviour
     private void RefreshSceneState()
     {
         _isInGameplayScene = SceneManager.GetActiveScene().name == GameplaySceneName;
-
-        if (_renderers != null)
-        {
-            for (int i = 0; i < _renderers.Length; i++)
-            {
-                if (_renderers[i] != null)
-                {
-                    _renderers[i].enabled = _isInGameplayScene;
-                }
-            }
-
-            // In host-client tests, keep the local owner mesh explicitly enabled during gameplay.
-            if (_isInGameplayScene && IsOwner)
-            {
-                for (int i = 0; i < _renderers.Length; i++)
-                {
-                    if (_renderers[i] != null)
-                    {
-                        _renderers[i].enabled = true;
-                    }
-                }
-            }
-        }
-
-        if (_colliders != null)
-        {
-            for (int i = 0; i < _colliders.Length; i++)
-            {
-                if (_colliders[i] != null)
-                {
-                    _colliders[i].enabled = _isInGameplayScene;
-                }
-            }
-        }
 
         if (!_loggedInitialVisibilityState && IsOwner)
         {

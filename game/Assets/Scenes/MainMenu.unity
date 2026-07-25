@@ -2566,6 +2566,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RelayManager
   maxPlayers: 5
+  survivorPrefab: {fileID: 6711646446549554900, guid: a8259d55483745938db44af8ec071d86, type: 3}
+  monsterPrefab: {fileID: 6711646446549554900, guid: d4656517482b47fc84036954d1ace79e, type: 3}
 --- !u!114 &1753633345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2613,7 +2615,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1753633345}
-    PlayerPrefab: {fileID: 6711646446549554900, guid: 40278f34b8d6a4044b720c97c4359d78, type: 3}
+    PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: a5a79e609d6a0402b8e5fb2e186be381, type: 2}

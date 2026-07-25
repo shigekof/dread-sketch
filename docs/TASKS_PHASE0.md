@@ -77,11 +77,11 @@
 
 ### Player Spawning
 
-- [ ] 🟡 Create `PlayerSpawner.cs` (NetworkBehaviour) — spawns correct prefab per role:
+- [x] 🟡 Create `PlayerSpawner.cs` (NetworkBehaviour) — spawns correct prefab per role:
   - First player to connect = Monster
   - Players 2–5 = Survivors
-- [ ] 🟢 Create `SurvivorPrefab` — capsule mesh, `NetworkObject`, `NetworkTransform`
-- [ ] 🟢 Create `MonsterPrefab` — capsule mesh (slightly taller), `NetworkObject`, `NetworkTransform`
+- [x] 🟢 Create `SurvivorPrefab` — capsule mesh, `NetworkObject`, `NetworkTransform`
+- [x] 🟢 Create `MonsterPrefab` — capsule mesh (slightly taller), `NetworkObject`, `NetworkTransform`
 - [x] 🟢 Define 5 spawn points in the map scene (tagged `SpawnPoint`)
 - [ ] 🟡 Test: host + 4 clients can all connect and see each other's capsules moving
 
